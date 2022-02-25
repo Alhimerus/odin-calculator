@@ -1,3 +1,9 @@
+let displayValue = "";
+let solution = 0;
+
+const input = document.getElementsByClassName("input")[0];
+const output = document.getElementsByClassName("output")[0];
+
 function add(a, b) {
   return a + b;
 }
