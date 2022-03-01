@@ -44,6 +44,14 @@ button:active {
   background-color: rgb(200, 25, 50);
 }
 
+.backspace {
+  background-color: rgb(30, 195, 65);
+}
+
+.equals {
+  background-color: rgb(50, 160, 225);
+}
+
 .row {
   display: flex;
   max-width: 1200px;
