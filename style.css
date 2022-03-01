@@ -52,6 +52,10 @@ button:active {
   background-color: rgb(50, 160, 225);
 }
 
+.decimal {
+  background-color: rgb(225, 225, 115);
+}
+
 .row {
   display: flex;
   max-width: 1200px;
