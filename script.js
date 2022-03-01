@@ -1,6 +1,9 @@
 let inputDisplayValue = "";
 let outputDisplayValue = "";
-let solution = 0;
+let previousNumber = "";
+let currentNumber = "";
+let currentOperator = "";
+let solution = "";
 
 const input = document.getElementsByClassName("input")[0];
 const output = document.getElementsByClassName("output")[0];
@@ -10,10 +13,6 @@ const clearButton = document.getElementsByClassName("clear")[0];
 const decimalButton = document.getElementsByClassName("decimal")[0];
 const backspaceButton = document.getElementsByClassName("backspace")[0];
 const equalsButton = document.getElementsByClassName("equals")[0];
-
-/* for (let i = 0; i < operatorButtons.length; i++) {
-  console.log(operatorButtons[i].textContent);
-} */
 
 function add(a, b) {
   return a + b;
@@ -33,6 +32,8 @@ function divide(a, b) {
 }
 
 function operate(number1, operator, number2) {
+  number1 = Number(number1);
+  number2 = Number(number2);
   switch (operator) {
     case "+":
       return add(number1, number2);
@@ -49,28 +50,75 @@ function operate(number1, operator, number2) {
 
 for (let i = 0; i < numberButtons.length; i++) {
   numberButtons[i].addEventListener("click", () => {
-    console.log(numberButtons[i].textContent);
+    if (currentNumber.length < 9 && currentNumber !== "0") {
+      inputDisplayValue += numberButtons[i].textContent;
+      currentNumber += numberButtons[i].textContent;
+    } else if (currentNumber === "0" && !previousNumber) {
+      inputDisplayValue = numberButtons[i].textContent;
+      currentNumber = numberButtons[i].textContent;
+    } else {
+      currentNumber = currentNumber.slice(0, currentNumber.length - 1);
+      inputDisplayValue = inputDisplayValue.slice(0, inputDisplayValue.length - 1);
+      inputDisplayValue += numberButtons[i].textContent;
+      currentNumber += numberButtons[i].textContent;
+    }
+    input.textContent = inputDisplayValue;
   });
 }
 
 for (let i = 0; i < operatorButtons.length; i++) {
   operatorButtons[i].addEventListener("click", () => {
-    console.log(operatorButtons[i].textContent);
+    if (currentNumber !== "" || currentOperator !== "") {
+      if (currentOperator === "") {
+        previousNumber = currentNumber;
+      } else if ((currentOperator === "*" || currentOperator === "/") && currentNumber === "") {
+        previousNumber = operate(previousNumber, currentOperator, 1);
+        inputDisplayValue = previousNumber;
+      } else {
+        previousNumber = operate(previousNumber, currentOperator, currentNumber);
+        inputDisplayValue = previousNumber;
+      }
+      currentNumber = "";
+      currentOperator = operatorButtons[i].textContent;
+      inputDisplayValue += ` ${operatorButtons[i].textContent} `;
+      input.textContent = inputDisplayValue;
+      solution = previousNumber;
+      output.textContent = solution;
+    }
   });
 }
 
 clearButton.addEventListener("click", () => {
-  console.log(clearButton.textContent);
+  input.textContent = "0";
+  output.textContent = "0";
+  inputDisplayValue = "";
+  outputDisplayValue = "";
+  previousNumber = "";
+  currentNumber = "";
+  currentOperator = "";
+  solution = "";
 });
 
 decimalButton.addEventListener("click", () => {
-  console.log(decimalButton.textContent);
+  if (!currentNumber.includes(".") && currentNumber !== "") {
+    currentNumber += ".";
+    inputDisplayValue += ".";
+    input.textContent = inputDisplayValue;
+  }
 });
 
 backspaceButton.addEventListener("click", () => {
-  console.log(backspaceButton.textContent);
+  if (currentNumber.length > 0) {
+    currentNumber = currentNumber.slice(0, currentNumber.length - 1);
+    inputDisplayValue = inputDisplayValue.slice(0, inputDisplayValue.length - 1);
+    if (inputDisplayValue === "") {
+      inputDisplayValue = "0";
+    }
+    input.textContent = inputDisplayValue;
+  }
 });
 
 equalsButton.addEventListener("click", () => {
-  console.log(equalsButton.textContent);
+  solution = operate(previousNumber, currentOperator, currentNumber);
+  output.textContent = solution;
 });
