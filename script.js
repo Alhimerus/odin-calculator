@@ -1,10 +1,3 @@
-let inputDisplayValue = "";
-let outputDisplayValue = "";
-let previousNumber = "";
-let currentNumber = "";
-let currentOperator = "";
-let solution = "";
-
 const input = document.getElementsByClassName("input")[0];
 const output = document.getElementsByClassName("output")[0];
 const numberButtons = document.getElementsByClassName("number");
@@ -13,6 +6,16 @@ const clearButton = document.getElementsByClassName("clear")[0];
 const decimalButton = document.getElementsByClassName("decimal")[0];
 const backspaceButton = document.getElementsByClassName("backspace")[0];
 const equalsButton = document.getElementsByClassName("equals")[0];
+
+let previousNumber = "";
+let currentOperator = "";
+let currentNumber = "";
+let solution = "";
+let inputText = "";
+let outputText = "";
+let equalsWasPressed = false;
+input.textContent = inputText;
+output.textContent = outputText;
 
 function add(a, b) {
   return a + b;
@@ -27,7 +30,11 @@ function multiply(a, b) {
 }
 
 function divide(a, b) {
-  if (b === 0) return "No";
+  if (b === 0) {
+    alert("Don't divide by 0")
+    clear();
+    return;
+  }
   return a / b;
 }
 
@@ -50,41 +57,13 @@ function operate(number1, operator, number2) {
 
 for (let i = 0; i < numberButtons.length; i++) {
   numberButtons[i].addEventListener("click", () => {
-    if (currentNumber.length < 9 && currentNumber !== "0") {
-      inputDisplayValue += numberButtons[i].textContent;
-      currentNumber += numberButtons[i].textContent;
-    } else if (currentNumber === "0" && !previousNumber) {
-      inputDisplayValue = numberButtons[i].textContent;
-      currentNumber = numberButtons[i].textContent;
-    } else {
-      currentNumber = currentNumber.slice(0, currentNumber.length - 1);
-      inputDisplayValue = inputDisplayValue.slice(0, inputDisplayValue.length - 1);
-      inputDisplayValue += numberButtons[i].textContent;
-      currentNumber += numberButtons[i].textContent;
-    }
-    input.textContent = inputDisplayValue;
+    inputNumber(numberButtons[i].textContent);
   });
 }
 
 for (let i = 0; i < operatorButtons.length; i++) {
   operatorButtons[i].addEventListener("click", () => {
-    if (currentNumber !== "" || currentOperator !== "") {
-      if (currentOperator === "") {
-        previousNumber = currentNumber;
-      } else if ((currentOperator === "*" || currentOperator === "/") && currentNumber === "") {
-        previousNumber = operate(previousNumber, currentOperator, 1);
-        inputDisplayValue = previousNumber;
-      } else {
-        previousNumber = operate(previousNumber, currentOperator, currentNumber);
-        inputDisplayValue = previousNumber;
-      }
-      currentNumber = "";
-      currentOperator = operatorButtons[i].textContent;
-      inputDisplayValue += ` ${operatorButtons[i].textContent} `;
-      input.textContent = inputDisplayValue;
-      solution = previousNumber;
-      output.textContent = solution;
-    }
+    inputOperator(operatorButtons[i].textContent);
   });
 }
 
@@ -96,39 +75,93 @@ backspaceButton.addEventListener("click", backspace);
 
 equalsButton.addEventListener("click", equals);
 
+function inputNumber(number) {
+  if (equalsWasPressed) {
+    clear();
+  }
+  if (currentNumber !== "0" && currentNumber.length < 9) {
+    currentNumber += number;
+  }
+  inputText = previousNumber + " " + currentOperator + " " + currentNumber;
+  input.textContent = inputText;
+}
+
+function inputOperator(operator) {
+  equalsWasPressed = false;
+  if (currentNumber.length > 12) {
+    currentNumber = Number(currentNumber).toFixed(4);
+  }
+  if (previousNumber.length > 12) {
+    previousNumber = Number(previousNumber).toFixed(4);
+  }
+  if (currentNumber !== "" || currentOperator !== "") {
+    if (currentOperator === "") {
+      previousNumber = currentNumber;
+    } else if ((currentOperator === "*" || currentOperator === "/") && currentNumber === "") {
+      inputText = previousNumber;
+    } else {
+      previousNumber = String(operate(previousNumber, currentOperator, currentNumber));
+      if (previousNumber.length > 12) {
+        previousNumber = Number(previousNumber).toFixed(4);
+      }
+      inputText = previousNumber;
+    }
+    currentNumber = "";
+    currentOperator = operator;
+    inputText = previousNumber + " " + currentOperator + " " + currentNumber;
+    input.textContent = inputText;
+    solution = previousNumber;
+    if (solution.length > 12) {
+      solution = Number(solution).toFixed(4);
+    }
+    output.textContent = solution;
+  }
+}
+
 function clear() {
-  input.textContent = "0";
-  output.textContent = "0";
+  input.textContent = "";
+  output.textContent = "";
   inputDisplayValue = "";
   outputDisplayValue = "";
   previousNumber = "";
   currentNumber = "";
   currentOperator = "";
   solution = "";
+  equalsWasPressed = false;
 }
 
 function decimal() {
-  if (!currentNumber.includes(".") && currentNumber !== "") {
+  if (!currentNumber.includes(".") && !equalsWasPressed) {
+    if (currentNumber === "") { currentNumber = "0"; }
     currentNumber += ".";
-    inputDisplayValue += ".";
-    input.textContent = inputDisplayValue;
+    inputText = previousNumber + " " + currentOperator + " " + currentNumber;
+    input.textContent = inputText;
   }
 }
 
 function backspace() {
   if (currentNumber.length > 0) {
-  currentNumber = currentNumber.slice(0, currentNumber.length - 1);
-  inputDisplayValue = inputDisplayValue.slice(0, inputDisplayValue.length - 1);
-  if (inputDisplayValue === "") {
-    inputDisplayValue = "0";
+    currentNumber = currentNumber.slice(0, currentNumber.length - 1);
+    inputText = previousNumber + " " + currentOperator + " " + currentNumber;
+    input.textContent = inputText;
   }
-  input.textContent = inputDisplayValue;
-}
 }
 
 function equals() {
-  solution = operate(previousNumber, currentOperator, currentNumber);
-  output.textContent = solution;
+  if (currentNumber !== "") {
+    equalsWasPressed = true;
+    if (currentNumber.length > 12) {
+      currentNumber = Number(currentNumber).toFixed(4);
+    }
+    if (previousNumber.length > 12) {
+      previousNumber = Number(previousNumber).toFixed(4);
+    }
+    solution = String(operate(previousNumber, currentOperator, currentNumber));
+    if (solution.length > 12) {
+      solution = Number(solution).toFixed(4);
+    }
+    output.textContent = solution
+  }
 }
 
 function pressKey(e) {
@@ -143,28 +176,28 @@ function pressKey(e) {
     case "7":
     case "8":
     case "9":
-      console.log(e.key + " " + "Number!");
+      inputNumber(e.key);
       break;
     case "+":
     case "-":
     case "*":
     case "/":
-      console.log(e.key + " " + "Operator!");
+      inputOperator(e.key);
       break;
     case "Enter":
     case "=":
-      console.log(e.key + " " + "Equals!");
+      equals();
       break;
     case "c":
-      console.log(e.key + " " + "Clear!");
+      clear();
       break;
     case "b":
     case "Backspace":
-      console.log(e.key + " " + "Backspace!");
+      backspace();
       break;
     case ".":
     case ",":
-      console.log(e.key + " " + "Decimal!");
+      decimal();
       break;
   }
 }

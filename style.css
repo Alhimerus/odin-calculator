@@ -7,7 +7,7 @@ body {
   margin: auto;
   display: flex;
   flex-direction: column;
-  min-width: 412px;
+  min-width: 550px;
   max-width: 1200px;
   padding: 30px;
   border: 5px solid black;
@@ -82,9 +82,14 @@ button:active {
 .output {
   display: flex;
   justify-content: flex-end;
-  font-size: 20px;
+}
+
+.input {
+  font-size: 25px;
+  height: 60px;
 }
 
 .output {
   font-size: 30px;
+  height: 35px;
 }
