@@ -88,7 +88,15 @@ for (let i = 0; i < operatorButtons.length; i++) {
   });
 }
 
-clearButton.addEventListener("click", () => {
+clearButton.addEventListener("click", clear);
+
+decimalButton.addEventListener("click", decimal);
+
+backspaceButton.addEventListener("click", backspace);
+
+equalsButton.addEventListener("click", equals);
+
+function clear() {
   input.textContent = "0";
   output.textContent = "0";
   inputDisplayValue = "";
@@ -97,28 +105,68 @@ clearButton.addEventListener("click", () => {
   currentNumber = "";
   currentOperator = "";
   solution = "";
-});
+}
 
-decimalButton.addEventListener("click", () => {
+function decimal() {
   if (!currentNumber.includes(".") && currentNumber !== "") {
     currentNumber += ".";
     inputDisplayValue += ".";
     input.textContent = inputDisplayValue;
   }
-});
+}
 
-backspaceButton.addEventListener("click", () => {
+function backspace() {
   if (currentNumber.length > 0) {
-    currentNumber = currentNumber.slice(0, currentNumber.length - 1);
-    inputDisplayValue = inputDisplayValue.slice(0, inputDisplayValue.length - 1);
-    if (inputDisplayValue === "") {
-      inputDisplayValue = "0";
-    }
-    input.textContent = inputDisplayValue;
+  currentNumber = currentNumber.slice(0, currentNumber.length - 1);
+  inputDisplayValue = inputDisplayValue.slice(0, inputDisplayValue.length - 1);
+  if (inputDisplayValue === "") {
+    inputDisplayValue = "0";
   }
-});
+  input.textContent = inputDisplayValue;
+}
+}
 
-equalsButton.addEventListener("click", () => {
+function equals() {
   solution = operate(previousNumber, currentOperator, currentNumber);
   output.textContent = solution;
-});
+}
+
+function pressKey(e) {
+  switch (e.key) {
+    case "0":
+    case "1":
+    case "2":
+    case "3":
+    case "4":
+    case "5":
+    case "6":
+    case "7":
+    case "8":
+    case "9":
+      console.log(e.key + " " + "Number!");
+      break;
+    case "+":
+    case "-":
+    case "*":
+    case "/":
+      console.log(e.key + " " + "Operator!");
+      break;
+    case "Enter":
+    case "=":
+      console.log(e.key + " " + "Equals!");
+      break;
+    case "c":
+      console.log(e.key + " " + "Clear!");
+      break;
+    case "b":
+    case "Backspace":
+      console.log(e.key + " " + "Backspace!");
+      break;
+    case ".":
+    case ",":
+      console.log(e.key + " " + "Decimal!");
+      break;
+  }
+}
+
+window.addEventListener("keydown", pressKey);
